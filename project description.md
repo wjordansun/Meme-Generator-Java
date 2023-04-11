@@ -1,4 +1,4 @@
-Meme Generator
+**Meme Generator**
 
 Memes have taken the Internet by storm from way back the 1996 dancing baby to the Star Wars meme that seems to be everywhere today. It’s not hard to see why. Jokes are based on shared knowledge, and memes permeate popular conciousness by the shear force of repetition.
 
