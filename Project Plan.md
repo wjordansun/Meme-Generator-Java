@@ -8,8 +8,43 @@
 - Another page in the frontend where the user can view all of the created memes.
 
 
+Our plan is to use React.js/Next.js to create the pages for the frontend. We will call our Java functions in the backend using Javascript. We plan to have two folders to store the templates and the created memes that can be accessed by our code. 
+
 **Milestones**
 :
-> Week 1:
-> dsfkl
+> Week 1: Backend: Design a structure to store the list of templates in and pick templates along with selecting a format.
+          Frontend: Design figma layout for how the two pages should look like.    
+           
+> Week 2: Backend: Code text slots onto the image so that the user can input meme content into them.
+          Frontend: Code the first page of the frontend where users select the meme template.
+
+> Week 3: Backend: Write code that allows the uesr to save the image into a folder to later be retrieved by the browse page.
+          Frontend: Code the second page where the user can browse through all of the memes they created.
+
+> Week 4: Connect the Frontend and the Backend.
+
+> Week 5: Bug fixes, catching up, additional features.
+
+**Work Breakdown**
+:
+Weiliang Jordan Sun:
+Eric Rudzin:
+Samuel Schmitt:
+
+**Assumptions**
+:
+
+For the scope of our first draft, we are assuming that this program is intended to be run on one persons computer, because the memes will be stored on a local folder that only the user can access.
+
+**Challenges**
+:
+We forsee that coding text slots onto the images to create templates might be a challenge to overcome.
+
+**Question**
+:
+Is there any requirements/ rescrictions for connecting our frontend to the backend? We are currently unsure of how to approach this.
+
+
+
+
 
