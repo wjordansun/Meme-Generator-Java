@@ -6,7 +6,7 @@ Probably the most popular form of meme is an image macro. There is some backgrou
 
 While the earliest image macros were probably created using a graphics program, that becomes too tedious for something so formulaic. Wouldn’t it be nice to automate creation of a meme?
 
-Minimal Requirements
+**Minimal Requirements**
 Create a program that allows you to:
 
 Define a preset list of templates (at least one of which must have multiple text slots) using some file format
@@ -15,7 +15,7 @@ Select a meme template and populate it with arbitrary text
 Save the created meme as a file for retrieval later
 Browse all created memes
 
-Additional Feature Ideas
+**Additional Feature Ideas**
 How can these memes be shared with a user on another computer or over the internet?
 If a user gets bored with the preloaded template, can you give them a way to define their own?
 Can users customize the existing templates beyond just changing the text (e.g. fonts / colors / text placement)?
