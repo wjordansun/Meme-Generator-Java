@@ -1,3 +1,8 @@
 Report 1:
 
-This week, 
+This week, we worked on setting up our environment/git repo for the project. We also worked on brainstorming and developing our project plan. 
+Currently, we have a React.js/Next.js frontend that contains the bones of our application. At the moment, we only have placeholders for the meme templates that we will
+be adding. If the placerholder is clicked, we have a modal that prompts. This modal has a section for "Top Text" and "Bottom Text" that the user will be able to add.
+These two text sections will be the text added to the top and bottom of the meme and generate a new image file to be browsed.
+
+Git repo: https://github.com/wjordansun/Meme-Generator-Java

@@ -28,9 +28,9 @@ Our plan is to use React.js/Next.js to create the pages for the frontend. We wil
 
 **Work Breakdown**
 :
-Weiliang Jordan Sun:
-Eric Rudzin:
-Samuel Schmitt:
+Weiliang Jordan Sun: Work on backend Java functions
+Eric Rudzin: Work on backend Java functions
+Samuel Schmitt: Developing frontend and helping with backend connection
 
 **Assumptions**
 :
@@ -39,7 +39,8 @@ For the scope of our first draft, we are assuming that this program is intended 
 
 **Challenges**
 :
-We forsee that coding text slots onto the images to create templates might be a challenge to overcome.
+We forsee that coding text slots onto the images to create templates/rendering a new image with text might be a challenge to overcome.
+
 
 **Question**
 :
