@@ -25,15 +25,15 @@ public class MemeController {
 	
 	 @PostMapping("/generateMeme")
 	 @CrossOrigin
-	    public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText) throws IOException {
-		 
+	    //public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
+		public byte[] generateMeme(@RequestParam("templateName") String templateName, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		 	System.out.print("here");
 		 	
 		 	
 		 	 // Convert MultipartFile to BufferedImage
-	        BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+	        BufferedImage bufferedImage = ImageIO.read(new File(templateName));
 
-	        System.out.println(image);
+	        System.out.println(templateName);
 	        System.out.println(bufferedImage);
 	        System.out.println(topText);
 	        System.out.println(bottomText);
@@ -77,7 +77,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("output.jpg") );
+	        ImageIO.write(bImage2, "jpg", new File(fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
