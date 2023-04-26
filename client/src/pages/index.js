@@ -3,29 +3,33 @@ import axios from "axios";
 import Image from "next/image";
 import hotdog from "../../templates/hotdog.jpg";
 import spongebob from "../../templates/spongebob.jpg";
+import drakememe from "../../templates/drakememe.jpg";
+import society from "../../templates/society.jpg";
 
 const images = [
   {
     id: 1,
     src: hotdog,
     baseImage: "hotdog.jpg",
-    memeTemplate : "top-bottom"
+    memeTemplate: "top-bottom",
   },
   {
     id: 2,
     src: spongebob,
     baseImage: "spongebob.jpg",
-    memeTemplate : "top-bottom"
+    memeTemplate: "top-bottom",
   },
   {
     id: 3,
     src: drakememe,
     baseImage: "drakememe.jpg",
-    memeTemplate: "two-right"
+    memeTemplate: "two-right",
   },
   {
     id: 4,
-    src: "https://via.placeholder.com/200x200",
+    src: society,
+    baseImage: "society.jpg",
+    memeTemplate: "top",
   },
 ];
 
@@ -63,14 +67,14 @@ export default function Home() {
     if (topText.length && bottomText.length && fileName.length) {
       const formData = new FormData();
 
-      formData.append("templateName", selectedImage.template);
+      formData.append("baseImage", selectedImage.baseImage);
       formData.append("topText", topText);
-      formData.append("bottomText", bottomText);
+      if (bottomText !== "") formData.append("bottomText", bottomText);
       formData.append("fileName", fileName);
 
       try {
         const res = await axios.post(
-          "http://localhost:8080/generateMeme",
+          "http://localhost:8080/generateMeme/" + selectedImage.memeTemplate,
           formData,
           {
             headers: {
@@ -126,12 +130,14 @@ export default function Home() {
               >
                 {topText}
               </div>
-              <div
-                className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
-                style={{ textShadow: "1px 1px #000" }}
-              >
-                {bottomText}
-              </div>
+              {!selectedImage.memeTemplate === "top" && (
+                <div
+                  className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
+                  style={{ textShadow: "1px 1px #000" }}
+                >
+                  {bottomText}
+                </div>
+              )}
             </div>
 
             <form className="mt-4">
@@ -146,17 +152,19 @@ export default function Home() {
                   onChange={handleTopTextChange}
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Bottom Text
-                </label>
-                <input
-                  type="text"
-                  className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
-                  value={bottomText}
-                  onChange={handleBottomTextChange}
-                />
-              </div>
+              {!selectedImage.memeTemplate === "top" && (
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Bottom Text
+                  </label>
+                  <input
+                    type="text"
+                    className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
+                    value={bottomText}
+                    onChange={handleBottomTextChange}
+                  />
+                </div>
+              )}
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
                   File Name
