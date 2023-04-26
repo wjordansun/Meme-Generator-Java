@@ -77,7 +77,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File(fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File("/generated-images/" + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;

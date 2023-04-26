@@ -8,23 +8,23 @@ const images = [
   {
     id: 1,
     src: hotdog,
-    template: "hotdog.jpg",
+    baseImage: "hotdog.jpg",
+    memeTemplate : "top-bottom"
   },
   {
     id: 2,
     src: spongebob,
-    template: "spongebob.jpg",
+    baseImage: "spongebob.jpg",
+    memeTemplate : "top-bottom"
   },
   {
     id: 3,
-    src: "https://via.placeholder.com/200x200",
+    src: drakememe,
+    baseImage: "drakememe.jpg",
+    memeTemplate: "two-right"
   },
   {
     id: 4,
-    src: "https://via.placeholder.com/200x200",
-  },
-  {
-    id: 5,
     src: "https://via.placeholder.com/200x200",
   },
 ];
