@@ -1,2 +1,4 @@
-This week, we added multipe types of templates into our project. First we had to differentiate between the templates in the frontend, as different templates require different text inputs. For example, the society meme requires only top text for its template.
-Then, we had to add more POST routes in the Spring Boot backend to account for the different types of templates. We adjusted the position of the text to fit the correct template based on the image that the user selected.
+This week, we added multiple types of templates into our project. First we had to differentiate between the templates in the frontend, as different templates require different text inputs.
+For example, the society meme requires only top text for its template.
+Then, we had to add more POST routes in the Spring Boot backend to account for the different types of templates.
+We adjusted the position of the text to fit the correct template based on the image that the user selected.
