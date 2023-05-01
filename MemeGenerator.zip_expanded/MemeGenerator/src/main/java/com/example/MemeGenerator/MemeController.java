@@ -163,7 +163,7 @@ public class MemeController {
 	        FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
 	        int topTextWidth = topTextFontMetrics.stringWidth(topText);
 	        int topTextX = (bufferedImage.getWidth() - topTextWidth) * (4/3) ;
-	        int topTextY = topTextFontMetrics.getHeight() * (3/16);
+	        int topTextY = topTextFontMetrics.getHeight();
 	        graphics2D.drawString(topText, topTextX, topTextY);
 
 	        // Draw bottom text centered and aligned to the bottom middle of the image
@@ -172,7 +172,7 @@ public class MemeController {
 	        FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
 	        int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
 	        int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) * (4/3);
-	        int bottomTextY = (bufferedImage.getHeight() * (13/16) - bottomTextFontMetrics.getHeight());
+	        int bottomTextY = (bufferedImage.getHeight() - bottomTextFontMetrics.getHeight());
 	        graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
 
 	        // Dispose Graphics2D object
