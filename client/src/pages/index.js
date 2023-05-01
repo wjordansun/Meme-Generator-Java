@@ -152,7 +152,7 @@ export default function Home() {
                   onChange={handleTopTextChange}
                 />
               </div>
-              {selectedImage.memeTemplate !== "top" && (
+              (
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">
                     Bottom Text
@@ -164,7 +164,7 @@ export default function Home() {
                     onChange={handleBottomTextChange}
                   />
                 </div>
-              )}
+              )
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
                   File Name
