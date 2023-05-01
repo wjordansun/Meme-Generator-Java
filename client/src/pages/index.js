@@ -130,7 +130,7 @@ export default function Home() {
               >
                 {topText}
               </div>
-              {!selectedImage.memeTemplate === "top" && (
+              {selectedImage.memeTemplate !== "top" && (
                 <div
                   className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
                   style={{ textShadow: "1px 1px #000" }}
@@ -152,7 +152,7 @@ export default function Home() {
                   onChange={handleTopTextChange}
                 />
               </div>
-               (
+              {selectedImage.memeTemplate !== "top" && (
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">
                     Bottom Text
@@ -164,7 +164,7 @@ export default function Home() {
                     onChange={handleBottomTextChange}
                   />
                 </div>
-              )
+              )}
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
                   File Name
