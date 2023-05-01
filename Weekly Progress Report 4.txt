@@ -1,0 +1,2 @@
+This week, we worked on everything that went into our presentation. We had to write the slides, make everything pretty, and then record the presentation.
+We also worked on debugging the frontend so that the user inputs can be filtered based on what image template they select.
