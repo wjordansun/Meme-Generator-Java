@@ -12,14 +12,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+
 import javax.imageio.ImageIO;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 @RestController
 public class MemeController {
 	
@@ -77,7 +76,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
@@ -85,7 +84,7 @@ public class MemeController {
 	    }
 
 		@PostMapping("/generateMeme/top")
-	 @CrossOrigin
+	 	@CrossOrigin
 	    //public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		public byte[] generateMemeTop(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("fileName") String fileName) throws IOException {
 		 	System.out.print("here");
@@ -124,7 +123,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
@@ -185,13 +184,11 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
 	        
 	    }
-		
-		
 	
 }
