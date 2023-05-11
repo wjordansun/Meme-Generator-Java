@@ -65,10 +65,13 @@ export default function create() {
 
   const handleGenerateMeme = async (e) => {
     e.preventDefault();
-    if (topText.length && bottomText.length && fileName.length) {
+    if (topText.length && fileName.length) {
       const formData = new FormData();
-
-      formData.append("baseImage", selectedImage.baseImage);
+      if (selectedImage.memeTemplate === "user-upload") {
+        formData.append("baseImage", selectedImage.file);
+      } else {
+        formData.append("baseImage", selectedImage.baseImage);
+      }
       formData.append("topText", topText);
       if (bottomText !== "") formData.append("bottomText", bottomText);
       formData.append("fileName", fileName);
@@ -104,7 +107,8 @@ export default function create() {
         id: Date.now(),
         src: reader.result,
         baseImage: file.name,
-        memeTemplate: "top-bottom",
+        memeTemplate: "user-upload",
+        file: file,
       });
     };
 
@@ -173,19 +177,19 @@ export default function create() {
                   onChange={handleTopTextChange}
                 />
               </div>
-              (
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Bottom Text
-                </label>
-                <input
-                  type="text"
-                  className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
-                  value={bottomText}
-                  onChange={handleBottomTextChange}
-                />
-              </div>
-              )
+              {selectedImage.memeTemplate !== "top" && (
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Bottom Text
+                  </label>
+                  <input
+                    type="text"
+                    className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
+                    value={bottomText}
+                    onChange={handleBottomTextChange}
+                  />
+                </div>
+              )}
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
                   File Name
@@ -216,7 +220,7 @@ export default function create() {
         </div>
       )}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-2">Upload Image</h2>
+        <h2 className="text-2xl font-bold mb-2">Upload Image (1 MB Max)</h2>
         <input
           type="file"
           accept="image/jpeg, image/png"
