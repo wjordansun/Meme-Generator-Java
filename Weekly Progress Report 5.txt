@@ -1,0 +1,8 @@
+For the progress made this week, we made our fronted more presentable by giving it a title, along with the creation of another page to display the created memes.
+We were able to pull the created images by creating an api call in our next.js + react.js app.
+We also started working on the upload function so that the user can upload a meme image of their own to create memes from.
+This required us to make another api call and send the image template to the backend for the java code to create the meme.
+Because the user is uploading just the image, we also had to have an input for them to select which type of format they wanted,
+so that the java code could differentiate between them, and know where to draw the text onto the image using
+the graphics2D library.
+
