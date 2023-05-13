@@ -39,6 +39,7 @@ export default function create() {
   const [topText, setTopText] = useState("");
   const [bottomText, setBottomText] = useState("");
   const [fileName, setFileName] = useState("");
+  const [selectedFormat, setSelectedFormat] = useState("top-bottom");
 
   const handleImageClick = (image) => {
     setSelectedImage(image);
@@ -63,12 +64,17 @@ export default function create() {
     setFileName(e.target.value);
   };
 
+  const handleFormatChange = (e) => {
+    setSelectedFormat(e.target.value);
+  };
+
   const handleGenerateMeme = async (e) => {
     e.preventDefault();
     if (topText.length && fileName.length) {
       const formData = new FormData();
       if (selectedImage.memeTemplate === "user-upload") {
         formData.append("baseImage", selectedImage.file);
+        formData.append("selectedFormat", selectedFormat);
       } else {
         formData.append("baseImage", selectedImage.baseImage);
       }
@@ -76,6 +82,23 @@ export default function create() {
       if (bottomText !== "") formData.append("bottomText", bottomText);
       formData.append("fileName", fileName);
 
+      // if(selectedFormat !== "") {
+      //   try {
+      //     const res = await axios.post(
+      //       "http://localhost:8080/generateMeme/" + selectedImage.selectedFormat,
+      //       formData,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //         },
+      //       }
+      //     );
+      //     console.log(res.data);
+      //     alert(fileName + " created successfully!");
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
       try {
         const res = await axios.post(
           "http://localhost:8080/generateMeme/" + selectedImage.memeTemplate,
@@ -96,6 +119,7 @@ export default function create() {
     setTopText("");
     setBottomText("");
     setFileName("");
+    setSelectedFormat("");
   };
 
   const handleUploadImage = (e) => {
@@ -201,6 +225,22 @@ export default function create() {
                   onChange={handleFileNameChange}
                 />
               </div>
+              {selectedImage.memeTemplate === "user-upload" && (
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Choose Format
+                  </label>
+                  <select
+                    className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
+                    value={selectedFormat}
+                    onChange={handleFormatChange}
+                  >
+                    <option value="top-bottom">top-bottom</option>
+                    <option value="two-right">two-right</option>
+                    <option value="top">top</option>
+                  </select>
+                </div>
+              )}
               <button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
