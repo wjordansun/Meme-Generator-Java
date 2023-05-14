@@ -4,37 +4,47 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.PageAttributes.MediaType;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
-
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 @RestController
 public class MemeController {
 
+	public static final String MEME_FONT = "Arial";
+	public static final String IMAGE_DIR = "./images/base-images/";
+	public static final String OUTPUT_DIR = "./client/public/images/generated-images/";
 
-	private byte[] handleTwoRight(String baseImage, BufferedImage bufferedImage, String topText, String bottomText, String fileName ) throws IOException {
+	private byte[] handleTwoRight(BufferedImage bufferedImage, String topText, String bottomText, String fileName ) throws IOException {
 		// Create Graphics2D object from BufferedImage
 		Graphics2D graphics2D = bufferedImage.createGraphics();
 
 		// Set font and color for top text
-		Font topTextFont = new Font("Arial", Font.BOLD, 36);
+		Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 		Color topTextColor = Color.BLACK;
 
 		// Set font and color for bottom text
-		Font bottomTextFont = new Font("Arial", Font.BOLD, 36);
+		Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 		Color bottomTextColor = Color.BLACK;
 
 		// Draw top text centered and aligned to the top of the image
@@ -65,7 +75,7 @@ public class MemeController {
 
 		ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 		BufferedImage bImage2 = ImageIO.read(bis);
-		ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+		ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 		System.out.println("meme created");
 		
 		return memeImageBytes;
@@ -74,13 +84,10 @@ public class MemeController {
 	
 	 @PostMapping("/generateMeme/top-bottom")
 	 @CrossOrigin
-	    //public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		public byte[] generateMeme(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
-		 	System.out.print("here");
-		 	
-		 	
-		 	 // Convert MultipartFile to BufferedImage
-	        BufferedImage bufferedImage = ImageIO.read(new File("./images/base-images/" + baseImage));
+
+			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
 	        System.out.println(bufferedImage);
@@ -91,11 +98,11 @@ public class MemeController {
 	        Graphics2D graphics2D = bufferedImage.createGraphics();
 
 	        // Set font and color for top text
-	        Font topTextFont = new Font("Arial", Font.BOLD, 36);
+	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 	        Color topTextColor = Color.BLACK;
 
 	        // Set font and color for bottom text
-	        Font bottomTextFont = new Font("Arial", Font.BOLD, 36);
+	        Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 	        Color bottomTextColor = Color.BLACK;
 
 	        // Draw top text centered and aligned to the top of the image
@@ -126,7 +133,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
@@ -135,13 +142,10 @@ public class MemeController {
 
 		@PostMapping("/generateMeme/top")
 	 	@CrossOrigin
-	    //public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		public byte[] generateMemeTop(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("fileName") String fileName) throws IOException {
-		 	System.out.print("here");
-		 	
-		 	
-		 	 // Convert MultipartFile to BufferedImage
-	        BufferedImage bufferedImage = ImageIO.read(new File("./images/base-images/" + baseImage));
+
+			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
 	        System.out.println(bufferedImage);
@@ -151,7 +155,7 @@ public class MemeController {
 	        Graphics2D graphics2D = bufferedImage.createGraphics();
 
 	        // Set font and color for top text
-	        Font topTextFont = new Font("Arial", Font.BOLD, 36);
+	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 	        Color topTextColor = Color.BLACK;
 
 	        // Draw top text centered and aligned to the top of the image
@@ -173,7 +177,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
@@ -182,26 +186,24 @@ public class MemeController {
 
 		@PostMapping("/generateMeme/two-right")
 	 	@CrossOrigin
-	    //public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		public byte[] generateMemeTwoRight(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		 	System.out.print("here");
 		 	
-		 	
-		 	 // Convert MultipartFile to BufferedImage
-	        BufferedImage bufferedImage = ImageIO.read(new File("./images/base-images/" + baseImage));
+
+			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
 	        System.out.println(bufferedImage);
 	        System.out.println(topText);
 	        System.out.println(bottomText);
 	        
-			return handleTwoRight(baseImage, bufferedImage, topText, bottomText, fileName);
+			return handleTwoRight(bufferedImage, topText, bottomText, fileName);
 	        
 	    }
 
 		@PostMapping("/generateMeme/user-upload")
 		@CrossOrigin
-		//public byte[] generateMeme(@RequestParam("image") MultipartFile image, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 		public byte[] generateMeme(@RequestParam("baseImage") MultipartFile baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName, @RequestParam("selectedFormat") String selectedFormat) throws IOException {
 			System.out.print("here");
 			System.out.print(selectedFormat);
@@ -209,8 +211,8 @@ public class MemeController {
 			if ("two-right".equals(selectedFormat)) {
 			System.out.print("Im selected two-right");
 
-				BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
-				System.out.println(baseImage);
+			BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
+			System.out.println(baseImage);
 	        System.out.println(bufferedImage);
 	        System.out.println(topText);
 	        System.out.println(bottomText);
@@ -219,11 +221,11 @@ public class MemeController {
 	        Graphics2D graphics2D = bufferedImage.createGraphics();
 
 	        // Set font and color for top text
-	        Font topTextFont = new Font("Arial", Font.BOLD, 36);
+	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 	        Color topTextColor = Color.BLACK;
 
 	        // Set font and color for bottom text
-	        Font bottomTextFont = new Font("Arial", Font.BOLD, 36);
+	        Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 	        Color bottomTextColor = Color.BLACK;
 
 	        // Draw top text centered and aligned to the top of the image
@@ -254,7 +256,7 @@ public class MemeController {
 
 	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 	        System.out.println("meme created");
 	        
 	        return memeImageBytes;
@@ -272,11 +274,11 @@ public class MemeController {
 			Graphics2D graphics2D = bufferedImage.createGraphics();
 
 			// Set font and color for top text
-			Font topTextFont = new Font("Arial", Font.BOLD, 36);
+			Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 			Color topTextColor = Color.BLACK;
 
 			// Set font and color for bottom text
-			Font bottomTextFont = new Font("Arial", Font.BOLD, 36);
+			Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 			Color bottomTextColor = Color.BLACK;
 
 			// Draw top text centered and aligned to the top of the image
@@ -307,7 +309,7 @@ public class MemeController {
 
 			ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 			BufferedImage bImage2 = ImageIO.read(bis);
-			ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+			ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 			System.out.println("meme created");
 			
 			return memeImageBytes;
@@ -323,7 +325,7 @@ public class MemeController {
 				Graphics2D graphics2D = bufferedImage.createGraphics();
 	
 				// Set font and color for top text
-				Font topTextFont = new Font("Arial", Font.BOLD, 36);
+				Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
 				Color topTextColor = Color.BLACK;
 	
 				// Draw top text centered and aligned to the top of the image
@@ -345,7 +347,7 @@ public class MemeController {
 	
 				ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 				BufferedImage bImage2 = ImageIO.read(bis);
-				ImageIO.write(bImage2, "jpg", new File("./client/public/images/generated-images/" + fileName + ".jpg") );
+				ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
 				System.out.println("meme created");
 				
 				return memeImageBytes;
@@ -356,6 +358,44 @@ public class MemeController {
 			
 			
 			
+		}
+
+		
+		@GetMapping("/getAllImages")
+		public ResponseEntity<List<String>> getAllImages() {
+			List<String> imageNames = getImageNames();
+			return ResponseEntity.ok().body(imageNames);
+		}
+	
+		@GetMapping("/{imageName}")
+		public ResponseEntity<Resource> getImage(@PathVariable String imageName) {
+			Path imagePath = Paths.get(IMAGE_DIR, imageName);
+			try {
+				Resource resource = new UrlResource(imagePath.toUri());
+				if (resource.exists() && resource.isReadable()) {
+					return ResponseEntity.ok()
+							.contentType(MediaType.IMAGE_JPEG)
+							.body(resource);
+				} else {
+					return ResponseEntity.notFound().build();
+				}
+			} catch (MalformedURLException e) {
+				return ResponseEntity.notFound().build();
+			}
+		}
+	
+		private List<String> getImageNames() {
+			List<String> imageNames = new ArrayList<>();
+			File folder = new File(IMAGE_DIR);
+			File[] files = folder.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					if (file.isFile()) {
+						imageNames.add(file.getName());
+					}
+				}
+			}
+			return imageNames;
 		}
 
 

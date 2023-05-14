@@ -1,38 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import Image from "next/image";
-import hotdog from "../../templates/hotdog.jpg";
-import spongebob from "../../templates/spongebob.jpg";
-import drakememe from "../../templates/drakememe.jpg";
-import society from "../../templates/society.jpg";
+// import hotdog from "../../templates/hotdog.jpg";
+// import spongebob from "../../templates/spongebob.jpg";
+// import drakememe from "../../templates/drakememe.jpg";
+// import society from "../../templates/society.jpg";
 import Header from "@/components/header";
 
-const images = [
-  {
-    id: 1,
-    src: hotdog,
-    baseImage: "hotdog.jpg",
-    memeTemplate: "top-bottom",
-  },
-  {
-    id: 2,
-    src: spongebob,
-    baseImage: "spongebob.jpg",
-    memeTemplate: "top-bottom",
-  },
-  {
-    id: 3,
-    src: drakememe,
-    baseImage: "drakememe.jpg",
-    memeTemplate: "two-right",
-  },
-  {
-    id: 4,
-    src: society,
-    baseImage: "society.jpg",
-    memeTemplate: "top",
-  },
-];
+// const images = [
+//   {
+//     id: 1,
+//     src: hotdog,
+//     baseImage: "hotdog.jpg",
+//     memeTemplate: "top-bottom",
+//   },
+//   {
+//     id: 2,
+//     src: spongebob,
+//     baseImage: "spongebob.jpg",
+//     memeTemplate: "top-bottom",
+//   },
+//   {
+//     id: 3,
+//     src: drakememe,
+//     baseImage: "drakememe.jpg",
+//     memeTemplate: "two-right",
+//   },
+//   {
+//     id: 4,
+//     src: society,
+//     baseImage: "society.jpg",
+//     memeTemplate: "top",
+//   },
+// ];
 
 export default function create() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -40,6 +41,7 @@ export default function create() {
   const [bottomText, setBottomText] = useState("");
   const [fileName, setFileName] = useState("");
   const [selectedFormat, setSelectedFormat] = useState("top-bottom");
+  const [requestedImages, setRequestedImages] = useState([]);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);
@@ -67,6 +69,56 @@ export default function create() {
   const handleFormatChange = (e) => {
     setSelectedFormat(e.target.value);
   };
+
+  useEffect(() => {
+    // Function to retrieve all image names from the backend
+    const getAllImages = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/getAllImages");
+        const data = await response.json();
+        console.log("response");
+        console.log(response);
+        console.log("data");
+        console.log(data);
+        // Call the function to fetch each image
+        for (const key in data) {
+          getImage(data[key]);
+        }
+        console.log("Requested images");
+        console.log(requestedImages);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    // Function to fetch a single image
+    const getImage = async (imageName) => {
+      try {
+        const response = await fetch(`http://localhost:8080/${imageName}`);
+        const blob = await response.blob();
+
+        // Create a temporary URL for the image
+        const imageURL = URL.createObjectURL(blob);
+
+        // Add the image URL to the requestedImages array
+        setRequestedImages((prevImages) => [
+          ...prevImages,
+          {
+            id: uuidv4(),
+            src: imageURL,
+            baseImage: imageName,
+            memeTemplate: "top-bottom", // we probably need to remove the memeTemplate thing
+          },
+        ]);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    // Call the function to retrieve all image names on component mount
+    setRequestedImages([]);
+    getAllImages();
+  }, []); // Empty dependency array ensures the effect runs only once on mount
 
   const handleGenerateMeme = async (e) => {
     e.preventDefault();
@@ -146,7 +198,7 @@ export default function create() {
       <Header />
       <h1 className="text-center text-3xl font-bold mb-8">Templates</h1>
       <ul className="flex flex-wrap -mx-4">
-        {images.map((image) => (
+        {requestedImages.map((image) => (
           <li
             key={image.id}
             className="w-full md:w-1/2 lg:w-1/3 px-4 mb-8 cursor-pointer"
@@ -267,14 +319,6 @@ export default function create() {
           className="mb-4"
           onChange={handleUploadImage}
         />
-
-        {selectedImage && (
-          <div>
-            <h3 className="text-lg font-bold mb-2">Choose Format</h3>
-            {/* Format selection code here */}
-            {/* ... */}
-          </div>
-        )}
       </div>
     </main>
   );
