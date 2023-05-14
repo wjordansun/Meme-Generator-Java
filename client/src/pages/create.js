@@ -2,38 +2,7 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import Image from "next/image";
-// import hotdog from "../../templates/hotdog.jpg";
-// import spongebob from "../../templates/spongebob.jpg";
-// import drakememe from "../../templates/drakememe.jpg";
-// import society from "../../templates/society.jpg";
 import Header from "@/components/header";
-
-// const images = [
-//   {
-//     id: 1,
-//     src: hotdog,
-//     baseImage: "hotdog.jpg",
-//     memeTemplate: "top-bottom",
-//   },
-//   {
-//     id: 2,
-//     src: spongebob,
-//     baseImage: "spongebob.jpg",
-//     memeTemplate: "top-bottom",
-//   },
-//   {
-//     id: 3,
-//     src: drakememe,
-//     baseImage: "drakememe.jpg",
-//     memeTemplate: "two-right",
-//   },
-//   {
-//     id: 4,
-//     src: society,
-//     baseImage: "society.jpg",
-//     memeTemplate: "top",
-//   },
-// ];
 
 export default function create() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -74,18 +43,14 @@ export default function create() {
     // Function to retrieve all image names from the backend
     const getAllImages = async () => {
       try {
-        const response = await fetch("http://localhost:8080/getAllImages");
-        const data = await response.json();
-        console.log("response");
-        console.log(response);
-        console.log("data");
-        console.log(data);
+        const response = await axios.get(
+          "http://localhost:8080/getAllTemplates"
+        );
+        const data = response.data;
         // Call the function to fetch each image
         for (const key in data) {
           getImage(data[key]);
         }
-        console.log("Requested images");
-        console.log(requestedImages);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -94,8 +59,13 @@ export default function create() {
     // Function to fetch a single image
     const getImage = async (imageName) => {
       try {
-        const response = await fetch(`http://localhost:8080/${imageName}`);
-        const blob = await response.blob();
+        const response = await axios.get(
+          `http://localhost:8080/templates/${imageName}`,
+          {
+            responseType: "blob",
+          }
+        );
+        const blob = response.data;
 
         // Create a temporary URL for the image
         const imageURL = URL.createObjectURL(blob);
@@ -107,7 +77,6 @@ export default function create() {
             id: uuidv4(),
             src: imageURL,
             baseImage: imageName,
-            memeTemplate: "top-bottom", // we probably need to remove the memeTemplate thing
           },
         ]);
       } catch (error) {
@@ -153,7 +122,7 @@ export default function create() {
       // }
       try {
         const res = await axios.post(
-          "http://localhost:8080/generateMeme/" + selectedImage.memeTemplate,
+          "http://localhost:8080/generateMeme/" + selectedFormat,
           formData,
           {
             headers: {
@@ -231,7 +200,7 @@ export default function create() {
               >
                 {topText}
               </div>
-              {selectedImage.memeTemplate !== "top" && (
+              {selectedFormat !== "top" && (
                 <div
                   className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
                   style={{ textShadow: "1px 1px #000" }}
@@ -244,6 +213,20 @@ export default function create() {
             <form className="mt-4">
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
+                  Choose Format
+                </label>
+                <select
+                  className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
+                  value={selectedFormat}
+                  onChange={handleFormatChange}
+                >
+                  <option value="top-bottom">top-bottom</option>
+                  <option value="two-right">two-right</option>
+                  <option value="top">top</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">
                   Top Text
                 </label>
                 <input
@@ -253,7 +236,7 @@ export default function create() {
                   onChange={handleTopTextChange}
                 />
               </div>
-              {selectedImage.memeTemplate !== "top" && (
+              {selectedFormat !== "top" && (
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">
                     Bottom Text
@@ -277,22 +260,6 @@ export default function create() {
                   onChange={handleFileNameChange}
                 />
               </div>
-              {selectedImage.memeTemplate === "user-upload" && (
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Choose Format
-                  </label>
-                  <select
-                    className="block w-full rounded border-gray-400 shadow-sm py-2 px-3 leading-tight focus:outline-none focus:border-blue-500 text-black"
-                    value={selectedFormat}
-                    onChange={handleFormatChange}
-                  >
-                    <option value="top-bottom">top-bottom</option>
-                    <option value="two-right">two-right</option>
-                    <option value="top">top</option>
-                  </select>
-                </div>
-              )}
               <button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"

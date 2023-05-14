@@ -32,8 +32,8 @@ import org.springframework.core.io.UrlResource;
 public class MemeController {
 
 	public static final String MEME_FONT = "Arial";
-	public static final String IMAGE_DIR = "./images/base-images/";
-	public static final String OUTPUT_DIR = "./client/public/images/generated-images/";
+	public static final String TEMPLATE_DIR = "./images/base-images/";
+	public static final String OUTPUT_DIR = "./images/generated-images/";
 
 	private byte[] handleTwoRight(BufferedImage bufferedImage, String topText, String bottomText, String fileName ) throws IOException {
 		// Create Graphics2D object from BufferedImage
@@ -86,7 +86,7 @@ public class MemeController {
 	 @CrossOrigin
 		public byte[] generateMeme(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
 
-			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
 			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
@@ -144,7 +144,7 @@ public class MemeController {
 	 	@CrossOrigin
 		public byte[] generateMemeTop(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("fileName") String fileName) throws IOException {
 
-			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
 			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
@@ -190,7 +190,7 @@ public class MemeController {
 		 	System.out.print("here");
 		 	
 
-			Path imagePath = Paths.get(IMAGE_DIR, baseImage);
+			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
 			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
 
 	        System.out.println(baseImage);
@@ -361,15 +361,38 @@ public class MemeController {
 		}
 
 		
-		@GetMapping("/getAllImages")
-		public ResponseEntity<List<String>> getAllImages() {
-			List<String> imageNames = getImageNames();
+		@GetMapping("/getAllTemplates")
+		public ResponseEntity<List<String>> getAllTemplates() {
+			List<String> imageNames = getImageNames(TEMPLATE_DIR);
 			return ResponseEntity.ok().body(imageNames);
 		}
 	
-		@GetMapping("/{imageName}")
-		public ResponseEntity<Resource> getImage(@PathVariable String imageName) {
-			Path imagePath = Paths.get(IMAGE_DIR, imageName);
+		@GetMapping("/templates/{imageName}")
+		public ResponseEntity<Resource> getTemplate(@PathVariable String imageName) {
+			Path imagePath = Paths.get(TEMPLATE_DIR, imageName);
+			try {
+				Resource resource = new UrlResource(imagePath.toUri());
+				if (resource.exists() && resource.isReadable()) {
+					return ResponseEntity.ok()
+							.contentType(MediaType.IMAGE_JPEG)
+							.body(resource);
+				} else {
+					return ResponseEntity.notFound().build();
+				}
+			} catch (MalformedURLException e) {
+				return ResponseEntity.notFound().build();
+			}
+		}
+
+		@GetMapping("/getAllGeneratedImages")
+		public ResponseEntity<List<String>> getAllGeneratedImages() {
+			List<String> imageNames = getImageNames(OUTPUT_DIR);
+			return ResponseEntity.ok().body(imageNames);
+		}
+	
+		@GetMapping("/generatedImages/{imageName}")
+		public ResponseEntity<Resource> getGeneratedImage(@PathVariable String imageName) {
+			Path imagePath = Paths.get(OUTPUT_DIR, imageName);
 			try {
 				Resource resource = new UrlResource(imagePath.toUri());
 				if (resource.exists() && resource.isReadable()) {
@@ -384,9 +407,9 @@ public class MemeController {
 			}
 		}
 	
-		private List<String> getImageNames() {
+		private List<String> getImageNames(String directory) {
 			List<String> imageNames = new ArrayList<>();
-			File folder = new File(IMAGE_DIR);
+			File folder = new File(directory);
 			File[] files = folder.listFiles();
 			if (files != null) {
 				for (File file : files) {
