@@ -11,6 +11,7 @@ export default function Create() {
   const [fileName, setFileName] = useState("");
   const [selectedFormat, setSelectedFormat] = useState("top-bottom");
   const [requestedImages, setRequestedImages] = useState([]);
+  const [formError, setFormError] = useState(false);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);
@@ -93,6 +94,18 @@ export default function Create() {
 
   const handleGenerateMeme = async (e) => {
     e.preventDefault();
+    if (
+      topText === "" ||
+      (selectedFormat !== "top" && bottomText === "") ||
+      fileName === ""
+    ) {
+      setTopText("");
+      setBottomText("");
+      setFileName("");
+      setFormError(true);
+      return;
+    }
+    setFormError(false);
     if (topText.length && fileName.length) {
       const formData = new FormData();
       if (selectedImage.type === "user-upload") {
@@ -147,7 +160,6 @@ export default function Create() {
     setTopText("");
     setBottomText("");
     setFileName("");
-    setSelectedFormat("");
   };
 
   const handleUploadImage = (e) => {
@@ -285,6 +297,11 @@ export default function Create() {
                   onChange={handleFileNameChange}
                 />
               </div>
+              {formError && (
+                <p className="text-red-500 mb-4">
+                  Please fill out all the required fields.
+                </p>
+              )}
               <button
                 type="button"
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
