@@ -4,7 +4,7 @@ import axios from "axios";
 import Image from "next/image";
 import Header from "@/components/header";
 
-export default function create() {
+export default function Create() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [topText, setTopText] = useState("");
   const [bottomText, setBottomText] = useState("");
@@ -37,6 +37,9 @@ export default function create() {
 
   const handleFormatChange = (e) => {
     setSelectedFormat(e.target.value);
+    if (e.target.value === "top") {
+      setBottomText("");
+    }
   };
 
   useEffect(() => {
@@ -84,56 +87,60 @@ export default function create() {
       }
     };
 
-    // Call the function to retrieve all image names on component mount
     setRequestedImages([]);
     getAllImages();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  }, []);
 
   const handleGenerateMeme = async (e) => {
     e.preventDefault();
     if (topText.length && fileName.length) {
       const formData = new FormData();
-      if (selectedImage.memeTemplate === "user-upload") {
+      if (selectedImage.type === "user-upload") {
         formData.append("baseImage", selectedImage.file);
         formData.append("selectedFormat", selectedFormat);
+        if (selectedFormat === "top") {
+          formData.append("bottomText", "");
+        }
       } else {
         formData.append("baseImage", selectedImage.baseImage);
       }
       formData.append("topText", topText);
       if (bottomText !== "") formData.append("bottomText", bottomText);
       formData.append("fileName", fileName);
-
-      // if(selectedFormat !== "") {
-      //   try {
-      //     const res = await axios.post(
-      //       "http://localhost:8080/generateMeme/" + selectedImage.selectedFormat,
-      //       formData,
-      //       {
-      //         headers: {
-      //           "Content-Type": "multipart/form-data",
-      //         },
-      //       }
-      //     );
-      //     console.log(res.data);
-      //     alert(fileName + " created successfully!");
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
-      // }
-      try {
-        const res = await axios.post(
-          "http://localhost:8080/generateMeme/" + selectedFormat,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        console.log(res.data);
-        alert(fileName + " created successfully!");
-      } catch (error) {
-        console.log(error);
+      if (selectedImage.type === "user-upload") {
+        try {
+          const res = await axios.post(
+            "http://localhost:8080/generateMeme/user-upload",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log(res.data);
+          alert(fileName + " created successfully!");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      if (!selectedImage.type) {
+        console.log("made it");
+        try {
+          const res = await axios.post(
+            "http://localhost:8080/generateMeme/" + selectedFormat,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log(res.data);
+          alert(fileName + " created successfully!");
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
     setSelectedImage(null);
@@ -152,7 +159,7 @@ export default function create() {
         id: Date.now(),
         src: reader.result,
         baseImage: file.name,
-        memeTemplate: "user-upload",
+        type: "user-upload",
         file: file,
       });
     };
@@ -194,13 +201,31 @@ export default function create() {
                 layout="fill"
                 objectFit="contain"
               />
-              <div
-                className="absolute top-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
-                style={{ textShadow: "1px 1px #000" }}
-              >
-                {topText}
-              </div>
-              {selectedFormat !== "top" && (
+              {selectedFormat === "two-right" && (
+                <div
+                  className="absolute top-0 left-0 w-full h-1/2 flex items-center justify-end text-white font-bold text-2xl"
+                  style={{ textShadow: "1px 1px #000" }}
+                >
+                  {topText}
+                </div>
+              )}
+              {selectedFormat !== "two-right" && (
+                <div
+                  className="absolute top-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
+                  style={{ textShadow: "1px 1px #000" }}
+                >
+                  {topText}
+                </div>
+              )}
+              {selectedFormat !== "top" && selectedFormat === "two-right" && (
+                <div
+                  className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-end text-white font-bold text-2xl"
+                  style={{ textShadow: "1px 1px #000" }}
+                >
+                  {bottomText}
+                </div>
+              )}
+              {selectedFormat !== "top" && selectedFormat !== "two-right" && (
                 <div
                   className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center text-white font-bold text-2xl"
                   style={{ textShadow: "1px 1px #000" }}
@@ -251,7 +276,7 @@ export default function create() {
               )}
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
-                  File Name
+                  File Name (No Extension)
                 </label>
                 <input
                   type="text"

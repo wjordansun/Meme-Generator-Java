@@ -3,25 +3,11 @@ import Image from "next/image";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import Header from "@/components/header";
-import { sendError } from "next/dist/server/api-utils";
 
-export default function view() {
+export default function View() {
   const [requestedImages, setRequestedImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchGeneratedImages = async () => {
-  //     try {
-  //       const response = await fetch("/api/generated-images");
-  //       const data = await response.json();
-  //       setGeneratedImages(data.generatedImages);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   fetchGeneratedImages();
-  // }, []);
   useEffect(() => {
     // Function to retrieve all image names from the backend
     const getAllImages = async () => {
@@ -68,11 +54,9 @@ export default function view() {
         console.error("Error:", error);
       }
     };
-
-    // Call the function to retrieve all image names on component mount
     setRequestedImages([]);
     getAllImages();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  }, []);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);

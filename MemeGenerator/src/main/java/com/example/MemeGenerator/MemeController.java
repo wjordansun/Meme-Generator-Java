@@ -34,270 +34,384 @@ public class MemeController {
 	public static final String MEME_FONT = "Arial";
 	public static final String TEMPLATE_DIR = "./images/base-images/";
 	public static final String OUTPUT_DIR = "./images/generated-images/";
+	public static final int BORDER_THICKNESS = 2;
 
-	private byte[] handleTwoRight(BufferedImage bufferedImage, String topText, String bottomText, String fileName ) throws IOException {
+	private byte[] handleTwoRight(BufferedImage bufferedImage, String topText, String bottomText, String fileName) throws IOException {
 		// Create Graphics2D object from BufferedImage
 		Graphics2D graphics2D = bufferedImage.createGraphics();
-
+	
+		float fontSize = bufferedImage.getHeight() * 0.04f;
 		// Set font and color for top text
-		Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-		Color topTextColor = Color.BLACK;
-
+		Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+		Color topTextColor = Color.WHITE;
+		Color topTextBorderColor = Color.BLACK;
+	
 		// Set font and color for bottom text
-		Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-		Color bottomTextColor = Color.BLACK;
+		Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+		Color bottomTextColor = Color.WHITE;
+		Color bottomTextBorderColor = Color.BLACK;
+	
+		// Calculate the position of the top text
+		graphics2D.setFont(topTextFont);
+		FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
+		int topTextWidth = topTextFontMetrics.stringWidth(topText);
+		int topTextX = bufferedImage.getWidth() / 2 + bufferedImage.getWidth() / 4 - topTextWidth / 2;
+		int topTextY = bufferedImage.getHeight() / 4 + topTextFontMetrics.getAscent() + BORDER_THICKNESS;
+	
+		// Draw the top text border
+		graphics2D.setColor(topTextBorderColor);
+		for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+			for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+				graphics2D.drawString(topText, topTextX + i, topTextY + j);
+			}
+		}
+	
+		// Draw the top text
+		graphics2D.setColor(topTextColor);
+		graphics2D.drawString(topText, topTextX, topTextY);
+	
+		// Calculate the position of the bottom text
+		graphics2D.setFont(bottomTextFont);
+		FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
+		int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
+		int bottomTextX = bufferedImage.getWidth() / 2 + bufferedImage.getWidth() / 4 - bottomTextWidth / 2;
+		int bottomTextY = bufferedImage.getHeight() * 3 / 4 + bottomTextFontMetrics.getAscent() + BORDER_THICKNESS;
+	
+		// Draw the bottom text border
+		graphics2D.setColor(bottomTextBorderColor);
+		for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+			for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+				graphics2D.drawString(bottomText, bottomTextX + i, bottomTextY + j);
+			}
+		}
+	
+		// Draw the bottom text
+		graphics2D.setColor(bottomTextColor);
+		graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
+	
+		// Dispose Graphics2D object
+		graphics2D.dispose();
+	
+		// Convert BufferedImage to byte array
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+		byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
+	
+		ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
+		BufferedImage bImage2 = ImageIO.read(bis);
+		ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg"));
+	
+		return memeImageBytes;
+	}
+	
+	
+	
+	@PostMapping("/generateMeme/top-bottom")
+	@CrossOrigin
+	public byte[] generateMeme(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
+	
+		Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
+		BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
+	
+	
+		// Create Graphics2D object from BufferedImage
+		Graphics2D graphics2D = bufferedImage.createGraphics();
+	
+		float fontSize = bufferedImage.getHeight() * 0.08f;
+		// Set font and color for top text
+		Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+		Color topTextColor = Color.WHITE;
+		Color topTextBorderColor = Color.BLACK;
+	
+		// Set font and color for bottom text
+		Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+		Color bottomTextColor = Color.WHITE;
+		Color bottomTextBorderColor = Color.BLACK;
 
 		// Draw top text centered and aligned to the top of the image
 		graphics2D.setFont(topTextFont);
-		graphics2D.setColor(topTextColor);
 		FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
 		int topTextWidth = topTextFontMetrics.stringWidth(topText);
-		int topTextX = (bufferedImage.getWidth() - topTextWidth) * (4/3) ;
+		int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
 		int topTextY = topTextFontMetrics.getHeight();
+	
+		// Draw the top text border
+		graphics2D.setColor(topTextBorderColor);
+		for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+			for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+				graphics2D.drawString(topText, topTextX + i, topTextY + j);
+			}
+		}
+	
+		// Draw the top text
+		graphics2D.setColor(topTextColor);
 		graphics2D.drawString(topText, topTextX, topTextY);
-
+	
 		// Draw bottom text centered and aligned to the bottom middle of the image
 		graphics2D.setFont(bottomTextFont);
 		graphics2D.setColor(bottomTextColor);
 		FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
 		int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
-		int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) * (4/3);
-		int bottomTextY = (bufferedImage.getHeight() - bottomTextFontMetrics.getHeight());
+		int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) / 2;
+		int bottomTextY = bufferedImage.getHeight() - bottomTextFontMetrics.getHeight();
+	
+		// Draw the bottom text border
+		graphics2D.setColor(bottomTextBorderColor);
+		for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+			for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+				graphics2D.drawString(bottomText, bottomTextX + i, bottomTextY + j);
+			}
+		}
+	
+		// Draw the bottom text
+		graphics2D.setColor(bottomTextColor);
 		graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
-
+	
 		// Dispose Graphics2D object
 		graphics2D.dispose();
-
+	
 		// Convert BufferedImage to byte array
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
 		byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
-
+	
 		ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 		BufferedImage bImage2 = ImageIO.read(bis);
 		ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-		System.out.println("meme created");
 		
+		return memeImageBytes;
+	        
+	}
+
+	@PostMapping("/generateMeme/top")
+	@CrossOrigin
+	public byte[] generateMemeTop(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("fileName") String fileName) throws IOException {
+	
+		Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
+		BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
+	
+		// Create Graphics2D object from BufferedImage
+		Graphics2D graphics2D = bufferedImage.createGraphics();
+	
+		// Set font and color for top text
+		float fontSize = bufferedImage.getHeight() * 0.08f;
+		Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+		Color topTextColor = Color.WHITE;
+		Color topTextBorderColor = Color.BLACK;
+	
+		// Draw top text centered and aligned to the top of the image
+		graphics2D.setFont(topTextFont);
+		FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
+		int topTextWidth = topTextFontMetrics.stringWidth(topText);
+		int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
+		int topTextY = topTextFontMetrics.getHeight();
+	
+		// Draw the top text border
+		graphics2D.setColor(topTextBorderColor);
+		for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+			for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+				graphics2D.drawString(topText, topTextX + i, topTextY + j);
+			}
+		}
+	
+		// Draw the top text
+		graphics2D.setColor(topTextColor);
+		graphics2D.drawString(topText, topTextX, topTextY);
+	
+		// Dispose Graphics2D object
+		graphics2D.dispose();
+	
+		// Convert BufferedImage to byte array
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+		byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
+	
+		ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
+		BufferedImage bImage2 = ImageIO.read(bis);
+		ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg"));
+	
 		return memeImageBytes;
 	}
 
+	@PostMapping("/generateMeme/two-right")
+	@CrossOrigin
+	public byte[] generateMemeTwoRight(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
+
+		Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
+		BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
+
+		return handleTwoRight(bufferedImage, topText, bottomText, fileName);
+	}
+
+	@PostMapping("/generateMeme/user-upload")
+	@CrossOrigin
+	public byte[] generateMeme(@RequestParam("baseImage") MultipartFile baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName, @RequestParam("selectedFormat") String selectedFormat) throws IOException {
 	
-	 @PostMapping("/generateMeme/top-bottom")
-	 @CrossOrigin
-		public byte[] generateMeme(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
-
-			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
-			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
-
-	        System.out.println(baseImage);
-	        System.out.println(bufferedImage);
-	        System.out.println(topText);
-	        System.out.println(bottomText);
-	        
-	        // Create Graphics2D object from BufferedImage
-	        Graphics2D graphics2D = bufferedImage.createGraphics();
-
-	        // Set font and color for top text
-	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-	        Color topTextColor = Color.BLACK;
-
-	        // Set font and color for bottom text
-	        Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-	        Color bottomTextColor = Color.BLACK;
-
-	        // Draw top text centered and aligned to the top of the image
-	        graphics2D.setFont(topTextFont);
-	        graphics2D.setColor(topTextColor);
-	        FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
-	        int topTextWidth = topTextFontMetrics.stringWidth(topText);
-	        int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
-	        int topTextY = topTextFontMetrics.getHeight();
-	        graphics2D.drawString(topText, topTextX, topTextY);
-
-	        // Draw bottom text centered and aligned to the bottom middle of the image
-	        graphics2D.setFont(bottomTextFont);
-	        graphics2D.setColor(bottomTextColor);
-	        FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
-	        int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
-	        int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) / 2;
-	        int bottomTextY = bufferedImage.getHeight() - bottomTextFontMetrics.getHeight();
-	        graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
-
-	        // Dispose Graphics2D object
-	        graphics2D.dispose();
-
-	        // Convert BufferedImage to byte array
-	        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	        ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-	        byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
-
-	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
-	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-	        System.out.println("meme created");
-	        
-	        return memeImageBytes;
-	        
-	    }
-
-		@PostMapping("/generateMeme/top")
-	 	@CrossOrigin
-		public byte[] generateMemeTop(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("fileName") String fileName) throws IOException {
-
-			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
-			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
-
-	        System.out.println(baseImage);
-	        System.out.println(bufferedImage);
-	        System.out.println(topText);
-	        
-	        // Create Graphics2D object from BufferedImage
-	        Graphics2D graphics2D = bufferedImage.createGraphics();
-
-	        // Set font and color for top text
-	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-	        Color topTextColor = Color.BLACK;
-
-	        // Draw top text centered and aligned to the top of the image
-	        graphics2D.setFont(topTextFont);
-	        graphics2D.setColor(topTextColor);
-	        FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
-	        int topTextWidth = topTextFontMetrics.stringWidth(topText);
-	        int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
-	        int topTextY = topTextFontMetrics.getHeight();
-	        graphics2D.drawString(topText, topTextX, topTextY);
-
-	        // Dispose Graphics2D object
-	        graphics2D.dispose();
-
-	        // Convert BufferedImage to byte array
-	        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	        ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-	        byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
-
-	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
-	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-	        System.out.println("meme created");
-	        
-	        return memeImageBytes;
-	        
-	    }
-
-		@PostMapping("/generateMeme/two-right")
-	 	@CrossOrigin
-		public byte[] generateMemeTwoRight(@RequestParam("baseImage") String baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName) throws IOException {
-		 	System.out.print("here");
-		 	
-
-			Path imagePath = Paths.get(TEMPLATE_DIR, baseImage);
-			BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
-
-	        System.out.println(baseImage);
-	        System.out.println(bufferedImage);
-	        System.out.println(topText);
-	        System.out.println(bottomText);
-	        
-			return handleTwoRight(bufferedImage, topText, bottomText, fileName);
-	        
-	    }
-
-		@PostMapping("/generateMeme/user-upload")
-		@CrossOrigin
-		public byte[] generateMeme(@RequestParam("baseImage") MultipartFile baseImage, @RequestParam("topText") String topText, @RequestParam("bottomText") String bottomText, @RequestParam("fileName") String fileName, @RequestParam("selectedFormat") String selectedFormat) throws IOException {
-			System.out.print("here");
-			System.out.print(selectedFormat);
-
-			if ("two-right".equals(selectedFormat)) {
-			System.out.print("Im selected two-right");
-
+		if ("two-right".equals(selectedFormat)) {
+	
 			BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
-			System.out.println(baseImage);
-	        System.out.println(bufferedImage);
-	        System.out.println(topText);
-	        System.out.println(bottomText);
-	        
-	        // Create Graphics2D object from BufferedImage
-	        Graphics2D graphics2D = bufferedImage.createGraphics();
-
-	        // Set font and color for top text
-	        Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-	        Color topTextColor = Color.BLACK;
-
-	        // Set font and color for bottom text
-	        Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-	        Color bottomTextColor = Color.BLACK;
-
-	        // Draw top text centered and aligned to the top of the image
-	        graphics2D.setFont(topTextFont);
-	        graphics2D.setColor(topTextColor);
-	        FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
-	        int topTextWidth = topTextFontMetrics.stringWidth(topText);
-	        int topTextX = (bufferedImage.getWidth() - topTextWidth) * (4/3) ;
-	        int topTextY = topTextFontMetrics.getHeight();
-	        graphics2D.drawString(topText, topTextX, topTextY);
-
-	        // Draw bottom text centered and aligned to the bottom middle of the image
-	        graphics2D.setFont(bottomTextFont);
-	        graphics2D.setColor(bottomTextColor);
-	        FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
-	        int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
-	        int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) * (4/3);
-	        int bottomTextY = (bufferedImage.getHeight() - bottomTextFontMetrics.getHeight());
-	        graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
-
-	        // Dispose Graphics2D object
-	        graphics2D.dispose();
-
-	        // Convert BufferedImage to byte array
-	        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	        ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-	        byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
-
-	        ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
-	        BufferedImage bImage2 = ImageIO.read(bis);
-	        ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-	        System.out.println("meme created");
-	        
-	        return memeImageBytes;
-
-			} else if ("top-bottom".equals(selectedFormat)) {
-				// Convert MultipartFile to BufferedImage
-			BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
-
-			System.out.println(baseImage);
-			System.out.println(bufferedImage);
-			System.out.println(topText);
-			System.out.println(bottomText);
-			
 			// Create Graphics2D object from BufferedImage
 			Graphics2D graphics2D = bufferedImage.createGraphics();
-
+	
+			float fontSize = bufferedImage.getHeight() * 0.04f;
 			// Set font and color for top text
-			Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-			Color topTextColor = Color.BLACK;
-
+			Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+			Color topTextColor = Color.WHITE;
+			Color topTextBorderColor = Color.BLACK;
+	
 			// Set font and color for bottom text
-			Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-			Color bottomTextColor = Color.BLACK;
-
+			Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+			Color bottomTextColor = Color.WHITE;
+			Color bottomTextBorderColor = Color.BLACK;
+	
 			// Draw top text centered and aligned to the top of the image
 			graphics2D.setFont(topTextFont);
+			graphics2D.setColor(topTextBorderColor);
+			FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
+			int topTextWidth = topTextFontMetrics.stringWidth(topText);
+			int topTextX = (bufferedImage.getWidth() * 4 / 3 - topTextWidth) / 2;
+			int topTextY = topTextFontMetrics.getHeight();
+			
+			// Draw the top text border
+			for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+				for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+					graphics2D.drawString(topText, topTextX + i, topTextY + j);
+				}
+			}
+	
 			graphics2D.setColor(topTextColor);
+			graphics2D.drawString(topText, topTextX, topTextY);
+	
+			// Draw bottom text centered and aligned to the bottom middle of the image
+			graphics2D.setFont(bottomTextFont);
+			graphics2D.setColor(bottomTextBorderColor);
+			FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
+			int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
+			int bottomTextX = (bufferedImage.getWidth() * 4 / 3 - bottomTextWidth) / 2;
+			int bottomTextY = bufferedImage.getHeight() - bottomTextFontMetrics.getHeight();
+			
+			// Draw the bottom text border
+			for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+				for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+					graphics2D.drawString(bottomText, bottomTextX + i, bottomTextY + j);
+				}
+			}
+	
+			graphics2D.setColor(bottomTextColor);
+			graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
+	
+			// Dispose Graphics2D object
+			graphics2D.dispose();
+	
+			// Convert BufferedImage to byte array
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+			byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
+	
+			ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
+			BufferedImage bImage2 = ImageIO.read(bis);
+			ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
+			
+			return memeImageBytes;
+
+
+		} else if ("top-bottom".equals(selectedFormat)) {
+			// Convert MultipartFile to BufferedImage
+			BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
+		
+			// Create Graphics2D object from BufferedImage
+			Graphics2D graphics2D = bufferedImage.createGraphics();
+		
+			float fontSize = bufferedImage.getHeight() * 0.08f;
+			// Set font and color for top text
+			Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+			Color topTextColor = Color.WHITE;
+			Color topTextBorderColor = Color.BLACK;
+		
+			// Set font and color for bottom text
+			Font bottomTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+			Color bottomTextColor = Color.WHITE;
+			Color bottomTextBorderColor = Color.BLACK;
+		
+			// Draw top text centered and aligned to the top of the image
+			graphics2D.setFont(topTextFont);
+			graphics2D.setColor(topTextBorderColor);
 			FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
 			int topTextWidth = topTextFontMetrics.stringWidth(topText);
 			int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
 			int topTextY = topTextFontMetrics.getHeight();
+		
+			// Draw the top text border
+			for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+				for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+					graphics2D.drawString(topText, topTextX + i, topTextY + j);
+				}
+			}
+		
+			graphics2D.setColor(topTextColor);
 			graphics2D.drawString(topText, topTextX, topTextY);
-
+		
 			// Draw bottom text centered and aligned to the bottom middle of the image
 			graphics2D.setFont(bottomTextFont);
-			graphics2D.setColor(bottomTextColor);
+			graphics2D.setColor(bottomTextBorderColor);
 			FontMetrics bottomTextFontMetrics = graphics2D.getFontMetrics();
 			int bottomTextWidth = bottomTextFontMetrics.stringWidth(bottomText);
 			int bottomTextX = (bufferedImage.getWidth() - bottomTextWidth) / 2;
 			int bottomTextY = bufferedImage.getHeight() - bottomTextFontMetrics.getHeight();
+		
+			// Draw the bottom text border
+			for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+				for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+					graphics2D.drawString(bottomText, bottomTextX + i, bottomTextY + j);
+				}
+			}
+		
+			graphics2D.setColor(bottomTextColor);
 			graphics2D.drawString(bottomText, bottomTextX, bottomTextY);
+		
+			// Dispose Graphics2D object
+			graphics2D.dispose();
+		
+			// Convert BufferedImage to byte array
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+			byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
+		
+			ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
+			BufferedImage bImage2 = ImageIO.read(bis);
+			ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg"));
+		
+			return memeImageBytes;
+		} else if ("top".equals(selectedFormat)) {
+			// Convert MultipartFile to BufferedImage
+			BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
+
+			// Create Graphics2D object from BufferedImage
+			Graphics2D graphics2D = bufferedImage.createGraphics();
+
+			float fontSize = bufferedImage.getHeight() * 0.08f;
+   			 // Set font and color for top text
+			Font topTextFont = new Font(MEME_FONT, Font.BOLD, Math.round(fontSize));
+			Color topTextColor = Color.WHITE;
+			Color topTextBorderColor = Color.BLACK;
+
+			// Draw top text centered and aligned to the top of the image
+			graphics2D.setFont(topTextFont);
+			graphics2D.setColor(topTextBorderColor);
+			FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
+			int topTextWidth = topTextFontMetrics.stringWidth(topText);
+			int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
+			int topTextY = topTextFontMetrics.getHeight();
+
+			// Draw the top text border
+			for (int i = -BORDER_THICKNESS; i <= BORDER_THICKNESS; i++) {
+				for (int j = -BORDER_THICKNESS; j <= BORDER_THICKNESS; j++) {
+					graphics2D.drawString(topText, topTextX + i, topTextY + j);
+				}
+			}
+
+			graphics2D.setColor(topTextColor);
+			graphics2D.drawString(topText, topTextX, topTextY);
 
 			// Dispose Graphics2D object
 			graphics2D.dispose();
@@ -309,117 +423,75 @@ public class MemeController {
 
 			ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
 			BufferedImage bImage2 = ImageIO.read(bis);
-			ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-			System.out.println("meme created");
-			
+			ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg"));
+
 			return memeImageBytes;
-			} else if ("top".equals(selectedFormat)) {
-				// Convert MultipartFile to BufferedImage
-				BufferedImage bufferedImage = ImageIO.read(baseImage.getInputStream());
-
-				System.out.println(baseImage);
-				System.out.println(bufferedImage);
-				System.out.println(topText);
-				
-				// Create Graphics2D object from BufferedImage
-				Graphics2D graphics2D = bufferedImage.createGraphics();
-	
-				// Set font and color for top text
-				Font topTextFont = new Font(MEME_FONT, Font.BOLD, 36);
-				Color topTextColor = Color.BLACK;
-	
-				// Draw top text centered and aligned to the top of the image
-				graphics2D.setFont(topTextFont);
-				graphics2D.setColor(topTextColor);
-				FontMetrics topTextFontMetrics = graphics2D.getFontMetrics();
-				int topTextWidth = topTextFontMetrics.stringWidth(topText);
-				int topTextX = (bufferedImage.getWidth() - topTextWidth) / 2;
-				int topTextY = topTextFontMetrics.getHeight();
-				graphics2D.drawString(topText, topTextX, topTextY);
-	
-				// Dispose Graphics2D object
-				graphics2D.dispose();
-	
-				// Convert BufferedImage to byte array
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-				byte[] memeImageBytes = byteArrayOutputStream.toByteArray();
-	
-				ByteArrayInputStream bis = new ByteArrayInputStream(memeImageBytes);
-				BufferedImage bImage2 = ImageIO.read(bis);
-				ImageIO.write(bImage2, "jpg", new File(OUTPUT_DIR + fileName + ".jpg") );
-				System.out.println("meme created");
-				
-				return memeImageBytes;
-			}
-
-			 
-			return null;
-			
-			
-			
 		}
 
+		return new byte[0];
 		
-		@GetMapping("/getAllTemplates")
-		public ResponseEntity<List<String>> getAllTemplates() {
-			List<String> imageNames = getImageNames(TEMPLATE_DIR);
-			return ResponseEntity.ok().body(imageNames);
-		}
-	
-		@GetMapping("/templates/{imageName}")
-		public ResponseEntity<Resource> getTemplate(@PathVariable String imageName) {
-			Path imagePath = Paths.get(TEMPLATE_DIR, imageName);
-			try {
-				Resource resource = new UrlResource(imagePath.toUri());
-				if (resource.exists() && resource.isReadable()) {
-					return ResponseEntity.ok()
-							.contentType(MediaType.IMAGE_JPEG)
-							.body(resource);
-				} else {
-					return ResponseEntity.notFound().build();
-				}
-			} catch (MalformedURLException e) {
-				return ResponseEntity.notFound().build();
-			}
-		}
+	}
 
-		@GetMapping("/getAllGeneratedImages")
-		public ResponseEntity<List<String>> getAllGeneratedImages() {
-			List<String> imageNames = getImageNames(OUTPUT_DIR);
-			return ResponseEntity.ok().body(imageNames);
-		}
 	
-		@GetMapping("/generatedImages/{imageName}")
-		public ResponseEntity<Resource> getGeneratedImage(@PathVariable String imageName) {
-			Path imagePath = Paths.get(OUTPUT_DIR, imageName);
-			try {
-				Resource resource = new UrlResource(imagePath.toUri());
-				if (resource.exists() && resource.isReadable()) {
-					return ResponseEntity.ok()
-							.contentType(MediaType.IMAGE_JPEG)
-							.body(resource);
-				} else {
-					return ResponseEntity.notFound().build();
-				}
-			} catch (MalformedURLException e) {
+	@GetMapping("/getAllTemplates")
+	public ResponseEntity<List<String>> getAllTemplates() {
+		List<String> imageNames = getImageNames(TEMPLATE_DIR);
+		return ResponseEntity.ok().body(imageNames);
+	}
+
+	@GetMapping("/templates/{imageName}")
+	public ResponseEntity<Resource> getTemplate(@PathVariable String imageName) {
+		Path imagePath = Paths.get(TEMPLATE_DIR, imageName);
+		try {
+			Resource resource = new UrlResource(imagePath.toUri());
+			if (resource.exists() && resource.isReadable()) {
+				return ResponseEntity.ok()
+						.contentType(MediaType.IMAGE_JPEG)
+						.body(resource);
+			} else {
 				return ResponseEntity.notFound().build();
 			}
+		} catch (MalformedURLException e) {
+			return ResponseEntity.notFound().build();
 		}
-	
-		private List<String> getImageNames(String directory) {
-			List<String> imageNames = new ArrayList<>();
-			File folder = new File(directory);
-			File[] files = folder.listFiles();
-			if (files != null) {
-				for (File file : files) {
-					if (file.isFile()) {
-						imageNames.add(file.getName());
-					}
+	}
+
+	@GetMapping("/getAllGeneratedImages")
+	public ResponseEntity<List<String>> getAllGeneratedImages() {
+		List<String> imageNames = getImageNames(OUTPUT_DIR);
+		return ResponseEntity.ok().body(imageNames);
+	}
+
+	@GetMapping("/generatedImages/{imageName}")
+	public ResponseEntity<Resource> getGeneratedImage(@PathVariable String imageName) {
+		Path imagePath = Paths.get(OUTPUT_DIR, imageName);
+		try {
+			Resource resource = new UrlResource(imagePath.toUri());
+			if (resource.exists() && resource.isReadable()) {
+				return ResponseEntity.ok()
+						.contentType(MediaType.IMAGE_JPEG)
+						.body(resource);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (MalformedURLException e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	private List<String> getImageNames(String directory) {
+		List<String> imageNames = new ArrayList<>();
+		File folder = new File(directory);
+		File[] files = folder.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isFile()) {
+					imageNames.add(file.getName());
 				}
 			}
-			return imageNames;
 		}
+		return imageNames;
+	}
 
 
 }
